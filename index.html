@@ -1,0 +1,178 @@
+<html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Aplicación Web Personal </title>
+    </head>
+    <body>
+      <header-element></header-element>
+      <menu-element></menu-element>
+      <main-element>
+        <social-profile-element slot="social-profile"></social-profile-element>
+        <custom-table-element slot="custom-table"></custom-table-element>
+        <gallery-element slot="gallery"></gallery-element>
+      </main-element>
+      <footer-element></footer-element>
+    
+      <script>
+        // Header Component
+        class HeaderElement extends HTMLElement {
+          constructor() {
+            super();
+            const shadow = this.attachShadow({ mode: 'open' });
+            shadow.innerHTML = `
+              <style>
+                h1 { font-size: 2em; color: #333; text-align: center; }
+              </style>
+              <h1>Mi Aplicación Web</h1>
+            `;
+          }
+        }
+        customElements.define('header-element', HeaderElement);
+    
+        // Footer Component
+        class FooterElement extends HTMLElement {
+          constructor() {
+            super();
+            const shadow = this.attachShadow({ mode: 'open' });
+            shadow.innerHTML = `
+              <style>
+                footer { text-align: center; font-size: 0.9em; color: #666; padding: 1em 0; }
+              </style>
+              <footer>&copy; 2024 Mi Aplicación Web</footer>
+            `;
+          }
+        }
+        customElements.define('footer-element', FooterElement);
+    
+        // Main Component
+        class MainElement extends HTMLElement {
+          constructor() {
+            super();
+            const shadow = this.attachShadow({ mode: 'open' });
+            shadow.innerHTML = `
+              <style>
+                section { padding: 1em; }
+              </style>
+              <section>
+                <slot name="social-profile"></slot>
+                <slot name="custom-table"></slot>
+                <slot name="gallery"></slot>
+              </section>
+            `;
+          }
+        }
+        customElements.define('main-element', MainElement);
+    
+        // Menu Component
+        class MenuElement extends HTMLElement {
+          constructor() {
+            super();
+            const shadow = this.attachShadow({ mode: 'open' });
+            shadow.innerHTML = `
+              <style>
+                nav { display: flex; gap: 1em; justify-content: center; }
+                a { text-decoration: none; color: #007BFF; cursor: pointer; }
+                a:hover { text-decoration: underline; }
+              </style>
+              <nav>
+                <a href="#" data-page="social-profile">Perfil</a>
+                <a href="#" data-page="custom-table">Tabla</a>
+                <a href="#" data-page="gallery">Galería</a>
+              </nav>
+            `;
+    
+            shadow.querySelectorAll('a').forEach(link => {
+              link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('main-element > *').forEach(slot => slot.style.display = 'none');
+                document.querySelector(`main-element > [slot="${link.dataset.page}"]`).style.display = 'block';
+              });
+            });
+          }
+        }
+        customElements.define('menu-element', MenuElement);
+    
+        // Social Profile Component
+        class SocialProfileElement extends HTMLElement {
+          constructor() {
+            super();
+            const shadow = this.attachShadow({ mode: 'open' });
+            shadow.innerHTML = `
+              <style>
+                div { text-align: center; }
+              </style>
+              <div>
+                <h2>Perfil de Usuario</h2>
+                <p>Nombre: Rosario Aldanana</p>
+                <p>Email: rosarioaldana@hotmail.com</p>
+                <p>Teléfono: 0963031089</p>
+              </div>
+            `;
+          }
+        }
+        customElements.define('social-profile-element', SocialProfileElement);
+    
+        // Custom Table Component
+        class CustomTableElement extends HTMLElement {
+          constructor() {
+            super();
+            const shadow = this.attachShadow({ mode: 'open' });
+            shadow.innerHTML = `
+              <style>
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+              </style>
+              <table>
+                <thead>
+                  <tr><th>Nombre</th><th>Email</th><th>Teléfono</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Rosario Aldanana</td><td>rosarioaldana@hotmail.com</td><td>0963031089</td></tr>
+                  <tr><td>Josue Montachana</td><td>josuemontachana@hotmail.com</td><td>2698774589</td></tr>
+                  <tr><td>Fabricio Montachana</td><td>fabriciomontachana@hotmail.com</td><td>0986452135</td></tr>
+                  <tr><td>Daniel Montachana</td><td>danielmontachana@hotmail.com</td><td>2589634185</td></tr>
+                  <tr><td>Amparo Aldana</td><td>amparoaldana@hotmail.com</td><td>1428895225</td></tr>
+                  <tr><td>Daisy Espinoza</td><td>daisyespinoza@hotmail.com</td><td>0963031056</td></tr>
+                  <tr><td>Magaly Hoyos</td><td>magalyhoyos@hotmail.com</td><td>0983801328</td></tr>
+                </tbody>
+              </table>
+            `;
+          }
+        }
+        customElements.define('custom-table-element', CustomTableElement);
+    
+        // Gallery Component
+        class GalleryElement extends HTMLElement {
+          constructor() {
+            super();
+            const shadow = this.attachShadow({ mode: 'open' });
+            shadow.innerHTML = `
+              <style>
+                .gallery { display: flex; flex-wrap: wrap; gap: 1em; justify-content: center; }
+                img { width: 100px; height: 100px; object-fit: cover; }
+              </style>
+              <div class="gallery"></div>
+            `;
+    
+            fetch('https://pokeapi.co/api/v2/pokemon?limit=10')
+              .then(response => response.json())
+              .then(data => {
+                const gallery = shadow.querySelector('.gallery');
+                data.results.forEach((pokemon, index) => {
+                  gallery.innerHTML += `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${index + 1}.png" alt="${pokemon.name}">`;
+                });
+              });
+          }
+        }
+        customElements.define('gallery-element', GalleryElement);
+    
+        // Hide all slots except the first one (default view)
+        document.addEventListener('DOMContentLoaded', () => {
+          document.querySelectorAll('main-element > *').forEach((slot, index) => {
+            slot.style.display = index === 0 ? 'block' : 'none';
+          });
+        });
+      </script>
+    </body>
+    </html>
